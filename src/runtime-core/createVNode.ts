@@ -22,10 +22,17 @@ export function createVNode(type, props?, children?) {
   } else if (Array.isArray(children)) {
     vnode.shapeFlag = vnode.shapeFlag | shapeFlags.ARRAY_CHILDREN;
   }
+
+  // 如果虚拟节点是 组件+children object
+  if (vnode.shapeFlag & shapeFlags.STATEFUL_COMPONENT) {
+    if (typeof children === "object") {
+      vnode.shapeFlag = shapeFlags.SLOT_CHILDREN;
+    }
+  }
   return vnode;
 }
 
-// 在创建虚拟节点的时候，判断虚拟节点的类型，给它的shapeFlag赋值，将其变成0001或0010
+// 在创建虚拟节点的时候，判断虚拟节点的类型，给它的shapeFlag赋值，将其变成0001(ELement类型)或0010(Component类型)
 function getShapeFlag(type) {
   return typeof type === "string"
     ? shapeFlags.ELEMENT

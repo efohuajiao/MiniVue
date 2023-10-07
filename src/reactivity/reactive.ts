@@ -1,17 +1,24 @@
-import { mutableHanlders, readonlyHandlers, shallowReadonlyHandlers } from "./baseHandlers";
+import {
+  mutableHanlders,
+  readonlyHandlers,
+  shallowReadonlyHandlers,
+} from "./baseHandlers";
 
 export const enum ReactiveFlags {
-    IS_REACTIVE = "__v_isReactive",
-    IS_READONLY = "__v_isReadonly",
+  IS_REACTIVE = "__v_isReactive",
+  IS_READONLY = "__v_isReadonly",
 }
 
 function createReactiveObject(raw, baseHandlers) {
-    return new Proxy(raw, baseHandlers);
+  if (!raw) {
+    console.warn(`raw ${raw} 必须是一个对象`);
+    return raw;
+  }
+  return new Proxy(raw, baseHandlers);
 }
 
-
-export function reactive (raw) {
-    return createReactiveObject(raw, mutableHanlders);
+export function reactive(raw) {
+  return createReactiveObject(raw, mutableHanlders);
 }
 
 /**
@@ -20,7 +27,7 @@ export function reactive (raw) {
  * @return {*}
  */
 export function readonly(raw) {
-    return createReactiveObject(raw, readonlyHandlers);
+  return createReactiveObject(raw, readonlyHandlers);
 }
 
 /**
@@ -29,9 +36,9 @@ export function readonly(raw) {
  * @return {*}
  */
 export function isReactive(value) {
-    // 如果是响应式，获取对象的值会触发get操作，在get中进行判断
-    // 如果不是，那么不会触发get操作，获取到的是undefined，用!!给它转换成false
-    return !!value[ReactiveFlags.IS_REACTIVE]; 
+  // 如果是响应式，获取对象的值会触发get操作，在get中进行判断
+  // 如果不是，那么不会触发get操作，获取到的是undefined，用!!给它转换成false
+  return !!value[ReactiveFlags.IS_REACTIVE];
 }
 
 /**
@@ -40,7 +47,7 @@ export function isReactive(value) {
  * @return {*}
  */
 export function isReadonly(value) {
-    return !!value[ReactiveFlags.IS_READONLY];
+  return !!value[ReactiveFlags.IS_READONLY];
 }
 
 /**
@@ -49,8 +56,8 @@ export function isReadonly(value) {
  * @return {*}
  */
 export function isProxy(value) {
-    // 只需判断是不是reactive或者readonly的即可
-    return isReactive(value) || isReadonly(value);
+  // 只需判断是不是reactive或者readonly的即可
+  return isReactive(value) || isReadonly(value);
 }
 
 /**
@@ -59,6 +66,5 @@ export function isProxy(value) {
  * @return {*}
  */
 export function shallowReadonly(value) {
-    return createReactiveObject(value, shallowReadonlyHandlers);
+  return createReactiveObject(value, shallowReadonlyHandlers);
 }
-

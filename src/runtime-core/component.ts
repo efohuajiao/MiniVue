@@ -1,18 +1,28 @@
+import { shallowReadonly } from "../reactivity/reactive";
+import { emit } from "./componentEmit";
+import { initProps } from "./componentProps";
 import { PublicInstanceProxyHandlers } from "./componentPublicInstance";
+import { initSlots } from "./componentSlot";
 
 export function createComponentInstance(vnode: any) {
   const component = {
     vnode,
     type: vnode.type,
     setupState: {},
+    props: {},
+    slots: {},
+    emit: () => {},
   };
-
+  // emit需要获取component这个实例参数，所以需要使用bind重新生成一个含有component参数的函数
+  component.emit = emit.bind(null, component) as any;
   return component;
 }
 
 export function setupComponent(instance) {
-  // initProps()
-  // initSlots()
+  // 初始化组件的props
+  initProps(instance, instance.vnode.props);
+  // 初始化组件的slots
+  initSlots(instance, instance.vnode.children);
 
   setupStatefulComponent(instance);
 }
@@ -30,7 +40,9 @@ function setupStatefulComponent(instance: any) {
   instance.proxy = new Proxy({ _: instance }, PublicInstanceProxyHandlers);
   // setup可能返回函数也可能返回对象
   if (setup) {
-    const setupResult = setup();
+    const setupResult = setup(shallowReadonly(instance.props), {
+      emit: instance.emit,
+    });
 
     handleSetupResult(instance, setupResult);
   }
