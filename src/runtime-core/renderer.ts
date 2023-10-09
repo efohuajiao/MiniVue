@@ -1,6 +1,7 @@
 import { isObject } from "../shared/index";
 import { shapeFlags } from "../shared/ShapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
+import { Fragment, Text } from "./createVNode";
 
 export function render(vnode, container) {
   patch(vnode, container);
@@ -18,13 +19,35 @@ function patch(vnode, container) {
 
   // 判断是不是element类型,是element就处理element类型
   // processElement();
-  const { shapeFlag } = vnode;
-  // 通过与运算判断是element类型还是component类型
-  if (shapeFlag & shapeFlags.ELEMENT) {
-    processElement(vnode, container);
-  } else if (shapeFlag & shapeFlags.STATEFUL_COMPONENT) {
-    processComponent(vnode, container);
+  const { type, shapeFlag } = vnode;
+  switch (type) {
+    // 使用fragment包裹插槽，直接去挂载children
+    case Fragment:
+      processFragment(vnode, container);
+      break;
+    case Text:
+      processText(vnode, container);
+      break;
+    default:
+      // 通过与运算判断是element类型还是component类型
+      if (shapeFlag & shapeFlags.ELEMENT) {
+        processElement(vnode, container);
+      } else if (shapeFlag & shapeFlags.STATEFUL_COMPONENT) {
+        processComponent(vnode, container);
+      }
+      break;
   }
+}
+
+function processFragment(vnode: any, container: any) {
+  mountChildren(vnode, container);
+}
+
+function processText(vnode: any, container: any) {
+  // console.log(vnode); type: Symbol(Text), props: {…}, shapeFlag: 6, children: '你好呀', el: null
+  const { children } = vnode;
+  const textNode = (vnode.el = document.createTextNode(children));
+  container.append(textNode);
 }
 
 /**

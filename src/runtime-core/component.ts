@@ -15,6 +15,7 @@ export function createComponentInstance(vnode: any) {
   };
   // emit需要获取component这个实例参数，所以需要使用bind重新生成一个含有component参数的函数
   component.emit = emit.bind(null, component) as any;
+
   return component;
 }
 
@@ -40,10 +41,12 @@ function setupStatefulComponent(instance: any) {
   instance.proxy = new Proxy({ _: instance }, PublicInstanceProxyHandlers);
   // setup可能返回函数也可能返回对象
   if (setup) {
+    // 调用setup时将此时的instance实例赋值给currentInstance，用于外部获取
+    setCurrentInstance(instance);
     const setupResult = setup(shallowReadonly(instance.props), {
       emit: instance.emit,
     });
-
+    setCurrentInstance(null);
     handleSetupResult(instance, setupResult);
   }
 }
@@ -60,4 +63,21 @@ function finishComponentSetup(instance: any) {
   const Component = instance.type;
 
   instance.render = Component.render;
+}
+
+let currentInstance = null;
+/**
+ * @description: 获取当前组件实例
+ * @return {*}
+ */
+export function getCurrentInstance() {
+  return currentInstance;
+}
+/**
+ * @description: 设置当前组件实例
+ * @param {*} instance
+ * @return {*}
+ */
+function setCurrentInstance(instance) {
+  currentInstance = instance;
 }

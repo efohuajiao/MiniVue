@@ -4,9 +4,9 @@ export const Foo = {
   setup(props, { emit }) {},
   render() {
     const foo = h("p", {}, "foo");
-    console.log(this.$slots);
+    const age = 18;
     return h("div", {}, [
-      renderSlots(this.$slots, "header", {age:18}),
+      renderSlots(this.$slots, "header", {age}),
       foo,
       renderSlots(this.$slots, "footer"),
     ]);
