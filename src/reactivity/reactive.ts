@@ -1,5 +1,5 @@
 import {
-  mutableHanlders,
+  mutableHanlders as mutableHandlers,
   readonlyHandlers,
   shallowReadonlyHandlers,
 } from "./baseHandlers";
@@ -18,7 +18,7 @@ function createReactiveObject(raw, baseHandlers) {
 }
 
 export function reactive(raw) {
-  return createReactiveObject(raw, mutableHanlders);
+  return createReactiveObject(raw, mutableHandlers);
 }
 
 /**

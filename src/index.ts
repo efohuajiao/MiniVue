@@ -1,1 +1,2 @@
-export * from './runtime-core'
+// mini-vue出口
+export * from "./runtime-dom";
