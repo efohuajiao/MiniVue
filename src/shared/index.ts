@@ -4,6 +4,7 @@ export const isObject = (obj) => {
   return obj !== null && typeof obj === "object";
 };
 
+export const EMPTY_OBJ = {};
 export function hasChanged(newVal, oldVal) {
   return !Object.is(newVal, oldVal);
 }

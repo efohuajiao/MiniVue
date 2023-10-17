@@ -1,3 +1,4 @@
+import { proxyRefs } from "../reactivity";
 import { shallowReadonly } from "../reactivity/reactive";
 import { emit } from "./componentEmit";
 import { initProps } from "./componentProps";
@@ -12,7 +13,8 @@ export function createComponentInstance(vnode: any, parent: any) {
     props: {},
     slots: {},
     provides: parent ? parent.provides : {},
-    parent,
+    parent, // 父节点
+    isMounted: false, // 表示是否第一次加载
     emit: () => {},
   };
   // emit需要获取component这个实例参数，所以需要使用bind重新生成一个含有component参数的函数
@@ -55,7 +57,8 @@ function setupStatefulComponent(instance: any) {
 
 function handleSetupResult(instance, setupResult: any) {
   if (typeof setupResult === "object") {
-    instance.setupState = setupResult;
+    // 当页面用到ref定义的数据时，用proxyRefs直接返回.value
+    instance.setupState = proxyRefs(setupResult);
   }
 
   finishComponentSetup(instance);
