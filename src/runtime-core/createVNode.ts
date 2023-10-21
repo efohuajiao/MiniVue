@@ -16,6 +16,7 @@ export function createVNode(type, props?, children?) {
     props,
     shapeFlag: getShapeFlag(type),
     children,
+    key: props && props.key,
     el: null,
   };
   // 在创建虚拟节点的时候，判断虚拟节点children的类型，通过或运算给它的shapeFlag赋值，将其变成1001或1010或0101或0110
